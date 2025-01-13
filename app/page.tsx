@@ -1,8 +1,8 @@
-import Layout from "@/components/Layout";
+import CenterScreen from "@/components/CenterScreen/CenterScreen";
 import React from "react";
 
 const page = () => {
-  return <Layout />;
+  return <CenterScreen />
 };
 
 export default page;

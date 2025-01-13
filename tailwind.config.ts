@@ -10,7 +10,17 @@ export default {
     extend: {
       colors: {
         background: "var(--background)",
-        foreground: "var(--foreground)",
+        text: "var(--text)",
+        "secondary-btn": "var(--secondary-btn)",
+        "secondary-btn-text": "var(--secondary-btn-text)",
+        "primary-btn": "var(--primary-btn)",
+        "primary-btn-text": "var(--primary-btn-text)",
+      },
+      borderColor: {
+        DEFAULT: "var(--border-color)", // Use a separate var for border color
+      },
+      borderWidth: {
+        DEFAULT: "0px 1px", // Define default border width
       },
     },
   },
