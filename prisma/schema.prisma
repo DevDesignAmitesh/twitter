@@ -1,0 +1,63 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String   @id @default(cuid())
+  email            String?  @unique
+  emailVerified    String?
+  name             String?
+  userName         String?
+  bio              String?
+  image            String?
+  prfileImage      String?
+  coverImage       String?
+  hashedPassword   String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  followingIds     String[]
+  hasNotifications Boolean? @default(false)
+
+  posts         Post[]
+  comments      Comment[]
+  notifications Notification[]
+}
+
+model Post {
+  id        String   @id @default(cuid())
+  body      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId    String
+  likedIds  String[]
+
+  user      User   @relation(fields: [userId], references: [id])
+
+  comments  Comment[]
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  body      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId    String
+  postId    String
+
+  user User   @relation(fields: [userId], references: [id])
+  post Post   @relation(fields: [postId], references: [id])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  body      String?
+  createdAt DateTime @default(now())
+  userId    String
+
+  user User @relation(fields: [userId], references: [id])
+}

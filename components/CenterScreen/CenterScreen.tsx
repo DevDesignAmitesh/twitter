@@ -6,10 +6,39 @@ import AddTwitter from "./AddTwitter";
 import AllTwittes from "./AllTwittes";
 import { RxCross2 } from "react-icons/rx";
 import { useRouter } from "next/navigation";
+import { addTweet } from "@/app/api/actions/addTweet";
 
-const CenterScreen = () => {
+const CenterScreen = ({
+  session,
+  tweets,
+  existingUser,
+}: {
+  session: any;
+  tweets: any;
+  existingUser: any;
+}) => {
   const [panel, setPanel] = useState<boolean>(false);
+  const [tweet, setTweet] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
+
+  const tweetPost = async () => {
+    try {
+      setLoading(true);
+      if (!tweet) {
+        setLoading(false);
+        return;
+      }
+      await addTweet(tweet, session.user.email);
+      setTweet("");
+    } catch (e) {
+      setLoading(false);
+      setTweet("");
+    } finally {
+      setLoading(false);
+      setTweet("");
+    }
+  };
 
   return (
     <div className="min-h-screen relative border border-color flex flex-col justify-start items-center w-[100%] md:w-[65%] xl:w-[45%]">
@@ -31,13 +60,20 @@ const CenterScreen = () => {
         </div>
       </div>
       <Header label="Home" setPanel={setPanel} />
-      <AddTwitter label="Post" placeHolder="Whats happening . . . . ?" />
-      <AllTwittes onClick={() => router.push("/tweet")} />
-      <AllTwittes onClick={() => router.push("/tweet")} />
-      <AllTwittes onClick={() => router.push("/tweet")} />
-      <AllTwittes onClick={() => router.push("/tweet")} />
-      <AllTwittes onClick={() => router.push("/tweet")} />
-      <AllTwittes onClick={() => router.push("/tweet")} />
+      <AddTwitter
+        tweetPost={tweetPost}
+        value={tweet}
+        onChange={(e) => setTweet(e.target.value)}
+        label={loading ? "Loading..." : "Post"}
+        placeHolder="Whats happening . . . . ?"
+      />
+      {tweets.map((tweet: any) => (
+        <AllTwittes
+          tweet={tweet}
+          existingUser={existingUser}
+          onClick={() => router.push("/tweet")}
+        />
+      ))}
     </div>
   );
 };
