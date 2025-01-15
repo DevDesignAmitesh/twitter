@@ -17,5 +17,5 @@ export async function user(email: string) {
     return { message: "User not found" };
   }
 
-  return { message: "user found", user };
+  return { user };
 }

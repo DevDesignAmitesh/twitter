@@ -6,40 +6,71 @@ import AddTwitter from "./AddTwitter";
 import AllTwittes from "./AllTwittes";
 import { RxCross2 } from "react-icons/rx";
 import { useRouter } from "next/navigation";
-import { addTweet } from "@/app/api/actions/addTweet";
+import axios from "axios";
+import useSWR, { mutate } from "swr";
 
 const CenterScreen = ({
   session,
-  tweets,
   existingUser,
 }: {
   session: any;
-  tweets: any;
   existingUser: any;
 }) => {
   const [panel, setPanel] = useState<boolean>(false);
   const [tweet, setTweet] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
+  const [message, setMessage] = useState<string>("");
+  const fetcher = (url: any) => axios.get(url).then((res) => res.data);
+  const { data } = useSWR("/api/allTweet", fetcher);
+  const tweets = data?.allTweets || [];
 
-  const tweetPost = async () => {
-    try {
-      setLoading(true);
-      if (!tweet) {
-        setLoading(false);
-        return;
-      }
-      await addTweet(tweet, session.user.email);
-      setTweet("");
-    } catch (e) {
+  const handleAddTweet = async () => {
+  
+    if (!existingUser.email.trim() || !tweet.trim()) {
+      setMessage("Email and tweet body are required.");
       setLoading(false);
-      setTweet("");
+      return;
+    }
+  
+    const newTweet = {
+      id: Date.now(),
+      body: tweet,
+      email: existingUser.email,
+      createdAt: new Date().toISOString(), // Include timestamp for sorting
+    };
+  
+    // Optimistic UI update
+    mutate(
+      "/api/allTweet",
+      (currentData: any) => ({
+        allTweets: [newTweet, ...(currentData?.allTweets || [])],
+      }),
+      false // Disable revalidation for now
+    );
+  
+    try {
+      // Send the new tweet to the server
+      await axios.post("/api/addTweet", {
+        body: tweet,
+        email: existingUser.email,
+      });
+  
+      // Revalidate tweets from the server
+      mutate("/api/allTweet");
+      setMessage("Tweet added successfully!");
+      setTweet(""); // Clear input field
+    } catch (error) {
+      console.error("Error adding tweet:", error);
+      setMessage("Failed to add tweet. Please try again.");
+  
+      // Revert optimistic update on failure
+      mutate("/api/allTweet");
     } finally {
       setLoading(false);
-      setTweet("");
     }
   };
-
+  
   return (
     <div className="min-h-screen relative border border-color flex flex-col justify-start items-center w-[100%] md:w-[65%] xl:w-[45%]">
       <div
@@ -60,13 +91,25 @@ const CenterScreen = ({
         </div>
       </div>
       <Header label="Home" setPanel={setPanel} />
-      <AddTwitter
-        tweetPost={tweetPost}
-        value={tweet}
-        onChange={(e) => setTweet(e.target.value)}
-        label={loading ? "Loading..." : "Post"}
-        placeHolder="Whats happening . . . . ?"
-      />
+      {session ? (
+        <AddTwitter
+          existingUser={existingUser}
+          tweetPost={handleAddTweet}
+          value={tweet}
+          onChange={(e) => setTweet(e.target.value)}
+          label={loading ? "Loading..." : "Post"}
+          placeHolder="Whats happening . . . . ?"
+        />
+      ) : (
+        <div className="w-full p-5">
+          <button
+            onClick={() => router.push("/auth")}
+            className="w-full p-2 bg-secondary-btn text-secondary-btn-text rounded-md mt-10 mb-10"
+          >
+            Register
+          </button>
+        </div>
+      )}
       {tweets.map((tweet: any) => (
         <AllTwittes
           tweet={tweet}

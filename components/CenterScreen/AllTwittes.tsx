@@ -9,7 +9,6 @@ interface AllTwittesProps {
 }
 
 const AllTwittes = ({ onClick, tweet, existingUser }: AllTwittesProps) => {
-
   return (
     <>
       <div
@@ -25,16 +24,20 @@ const AllTwittes = ({ onClick, tweet, existingUser }: AllTwittesProps) => {
           />
           <div className="w-full flex flex-col gap-4 justify-start items-start">
             <div className="w-full flex justify-start items-start flex-col gap-1">
-              <div className="flex justify-center gap-2 items-center">
-                <h1 className="text-text text-[16px]">{existingUser?.name}</h1>
-                <p className="text-gray-500 text-[13px]">
-                  {existingUser?.userName}
-                </p>
-                <p className="text-gray-500 text-[13px]">
+              <div className="flex w-full justify-start gap-1 md:flex-row flex-col md:gap-3 items-start">
+                <div className="flex justify-center items-start gap-2">
+                  <h1 className="text-text whitespace-nowrap w-full text-[14px]">
+                    {existingUser?.name}
+                  </h1>
+                  <p className="text-gray-500 whitespace-nowrap w-full text-[11px]">
+                    {existingUser?.userName}
+                  </p>
+                </div>
+                <p className="text-gray-500 whitespace-nowrap text-[11px]">
                   {new Date(tweet?.createdAt).toLocaleString()}
                 </p>
               </div>
-              <p>{tweet?.body}</p>
+              <p className="w-full">{tweet?.body}</p>
             </div>
             <div className="w-full flex justify-start items-start gap-10">
               <div className="flex text-gray-500 justify-center cursor-pointer items-center gap-1.5">
