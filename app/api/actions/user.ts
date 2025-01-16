@@ -11,6 +11,9 @@ export async function user(email: string) {
     where: {
       email,
     },
+    include: {
+      posts: true,
+    }
   });
 
   if (!user) {

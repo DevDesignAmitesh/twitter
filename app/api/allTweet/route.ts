@@ -7,7 +7,14 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const allTweets = await prisma.post.findMany();
+    const allTweets = await prisma.post.findMany({
+      include: {
+        user: true, // Include user details
+      },
+      orderBy: {
+        createdAt: "desc", // Sort posts by the `createdAt` field in descending order
+      },
+    });
     return NextResponse.json(
       {
         allTweets,

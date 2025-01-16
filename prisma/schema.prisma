@@ -21,6 +21,7 @@ model User {
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
   followingIds     String[]
+  followersCount   Int?
   hasNotifications Boolean? @default(false)
 
   posts         Post[]
@@ -29,16 +30,15 @@ model User {
 }
 
 model Post {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   body      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   userId    String
   likedIds  String[]
-
-  user      User   @relation(fields: [userId], references: [id])
-
   comments  Comment[]
+
+  user User @relation(fields: [userId], references: [id])
 }
 
 model Comment {
@@ -49,8 +49,8 @@ model Comment {
   userId    String
   postId    String
 
-  user User   @relation(fields: [userId], references: [id])
-  post Post   @relation(fields: [postId], references: [id])
+  user User @relation(fields: [userId], references: [id])
+  post Post @relation(fields: [postId], references: [id])
 }
 
 model Notification {

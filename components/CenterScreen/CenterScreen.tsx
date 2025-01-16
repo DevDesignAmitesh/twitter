@@ -20,57 +20,38 @@ const CenterScreen = ({
   const [tweet, setTweet] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
-  const [message, setMessage] = useState<string>("");
   const fetcher = (url: any) => axios.get(url).then((res) => res.data);
   const { data } = useSWR("/api/allTweet", fetcher);
   const tweets = data?.allTweets || [];
 
   const handleAddTweet = async () => {
-  
     if (!existingUser.email.trim() || !tweet.trim()) {
-      setMessage("Email and tweet body are required.");
+      setLoading(true);
       setLoading(false);
       return;
     }
-  
-    const newTweet = {
-      id: Date.now(),
-      body: tweet,
-      email: existingUser.email,
-      createdAt: new Date().toISOString(), // Include timestamp for sorting
-    };
-  
-    // Optimistic UI update
-    mutate(
-      "/api/allTweet",
-      (currentData: any) => ({
-        allTweets: [newTweet, ...(currentData?.allTweets || [])],
-      }),
-      false // Disable revalidation for now
-    );
-  
+
     try {
+      setLoading(true);
       // Send the new tweet to the server
       await axios.post("/api/addTweet", {
         body: tweet,
         email: existingUser.email,
       });
-  
+
       // Revalidate tweets from the server
       mutate("/api/allTweet");
-      setMessage("Tweet added successfully!");
       setTweet(""); // Clear input field
     } catch (error) {
       console.error("Error adding tweet:", error);
-      setMessage("Failed to add tweet. Please try again.");
-  
+
       // Revert optimistic update on failure
       mutate("/api/allTweet");
     } finally {
       setLoading(false);
     }
   };
-  
+
   return (
     <div className="min-h-screen relative border border-color flex flex-col justify-start items-center w-[100%] md:w-[65%] xl:w-[45%]">
       <div
@@ -113,8 +94,7 @@ const CenterScreen = ({
       {tweets.map((tweet: any) => (
         <AllTwittes
           tweet={tweet}
-          existingUser={existingUser}
-          onClick={() => router.push("/tweet")}
+          onClick={() => router.push(`/tweet/${tweet.id}`)}
         />
       ))}
     </div>

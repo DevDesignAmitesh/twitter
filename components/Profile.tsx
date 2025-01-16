@@ -113,7 +113,7 @@ const Profile = ({ user }: { user: any }) => {
                 }));
               }}
             />
-            {message && <p className="w-full">{message}</p>}
+            {message && <p className="w-full text-center">{message}</p>}
             <button
               onClick={updateUser}
               className="w-full hover:opacity-80 p-3 text-center rounded-md bg-background text-text"

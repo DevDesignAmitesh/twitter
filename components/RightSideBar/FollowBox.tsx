@@ -1,10 +1,10 @@
+import Link from "next/link";
 import React from "react";
 
 const FollowBox = ({ user }: { user: any }) => {
   return (
-    <div className="p-5 w-full border-color flex-col gap-4 flex justify-center items-start border-[1px] rounded-md">
-      <h1 className="text-text font-medium">Who to follow?</h1>
-      <div className="flex justify-center items-center gap-4">
+    <>
+      <div key={user?.id} className="flex justify-center items-center gap-4">
         <img
           className="h-12 object-cover object-center w-12 rounded-full"
           src={
@@ -13,12 +13,15 @@ const FollowBox = ({ user }: { user: any }) => {
           }
           alt="profile"
         />
-        <div className="flex justify-center items-start flex-col">
+        <Link
+          href={`/view/${user.id}`}
+          className="flex justify-center hover:border-b-[1px] border-color gap-2 items-center"
+        >
           <h1 className="text-text text-[16px]">{user?.name}</h1>
           <p className="text-gray-500 text-[13px]">{user?.userName}</p>
-        </div>
+        </Link>
       </div>
-    </div>
+    </>
   );
 };
 

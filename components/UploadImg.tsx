@@ -6,23 +6,45 @@ interface UploadImgProps {
   label: string;
   changeLabel: string;
   className?: string;
-  onImageChange: (imageUrl: string) => void,
+  onImageChange: (imageUrl: string) => void;
 }
 
 export default function UploadImg({
   label,
   changeLabel,
   className,
-  onImageChange
+  onImageChange,
 }: UploadImgProps) {
   const [img, setImg] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
-    if (selectedFile) {
-      const filePreviewURL = URL.createObjectURL(selectedFile);
-      onImageChange(filePreviewURL);
-      setImg(filePreviewURL);
+    if (!selectedFile) return;
+
+    setLoading(true);
+
+    const formData = new FormData();
+    formData.append("file", selectedFile);
+
+    try {
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setImg(data.url); // Set the image URL
+        onImageChange(data.url); // Notify parent component of the new image URL
+      } else {
+        console.error("Error uploading image:", data.error);
+      }
+    } catch (error) {
+      console.error("Error uploading image:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -30,7 +52,9 @@ export default function UploadImg({
     <div
       className={`w-full relative flex flex-col items-center justify-center bg-background text-text rounded-lg ${className}`}
     >
-      {!img ? (
+      {loading ? (
+        <p>Uploading...</p>
+      ) : !img ? (
         <label className="cursor-pointer bg-secondary-btn text-secondary-btn-text px-4 py-2 rounded-md">
           {label}
           <input
