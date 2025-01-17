@@ -6,11 +6,19 @@ import { user as User } from "../../app/api/actions/user";
 import { allNotification } from "@/app/api/actions/allNotification";
 import { redirect } from "next/navigation";
 
-const LeftSideBar = async () => {
+export async function AuthenticatedLayout({ children }: { children: React.ReactNode }) {
   const session: any = await getServerSession(auth);
+
   if (!session) {
     redirect("/auth");
   }
+
+  return <>{children}</>;
+}
+
+const LeftSideBar = async () => {
+  const session: any = await getServerSession(auth);
+  
   const email = session?.user?.email;
 
   const existingUser = await User(email);
