@@ -14,7 +14,6 @@ export async function register({
   userName: string;
   password: string;
 }) {
-  console.log(email, name, userName, password);
   if (!email || !name || !userName || !password) {
     return {
       success: false,
@@ -39,5 +38,12 @@ export async function register({
       message: "Failed to register user",
     };
   }
+
+  await prisma.notification.create({
+    data: {
+      body: "user registered succesfully",
+      userId: user.id,
+    },
+  });
   return { success: true, message: "User registered successfully", user };
 }

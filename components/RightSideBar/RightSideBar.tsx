@@ -7,7 +7,8 @@ import { auth } from "@/lib/auth";
 
 const RightSideBar = async () => {
   const session: any = await getServerSession(auth);
-  const allUser = await allUsers();
+  const email: any = session?.user?.email
+  const allUser = await allUsers(email);
   const users = allUser.allUsers;
 
   if (!session) {
@@ -20,7 +21,7 @@ const RightSideBar = async () => {
 
       <div className="p-5 w-full border-color flex-col gap-4 flex justify-center items-start border-[1px] rounded-md">
         <h1 className="text-text font-medium">Who to follow?</h1>
-        {users.map((user: any) => (
+        {users?.map((user: any) => (
           <FollowBox key={user.id} user={user} />
         ))}
       </div>

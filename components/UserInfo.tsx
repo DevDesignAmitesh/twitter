@@ -1,16 +1,44 @@
+"use client";
+
 import React from "react";
 import { SlCalender } from "react-icons/sl";
-import { format } from 'date-fns';
+import { format } from "date-fns";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 
 interface UserInfoProps {
-  setPopup?: any;
-  user: any;
+  setPopup?: any; // Used for editing profile
+  user: any; // Current logged-in user
+  list?: any;
 }
 
-const UserInfo = ({ setPopup, user }: UserInfoProps) => {
+const UserInfo = ({ setPopup, user, list }: UserInfoProps) => {
+  const router = useRouter();
+
+  const isFollowing = () => {
+    const isList = list || [];
+    return isList.includes(user?.id); // Check if `userId` is in the current user's followingIds
+  };
+
+  const res = isFollowing(); // Boolean: true if following, false otherwise
+
+  // Handle follow/unfollow action
+  const handleFollow = async () => {
+    if (!res) {
+      await axios.post("/api/follow", { userId: user?.id as string });
+      router.refresh();
+    } else {
+      await axios.delete("/api/follow", {
+        data: { userId: user?.id as string },
+      });
+      router.refresh();
+    }
+  };
+
   const formattedDate = user?.createdAt
-  ? format(new Date(user.createdAt), 'MMM yyyy')
-  : 'N/A'; 
+    ? format(new Date(user.createdAt), "MMM yyyy")
+    : "N/A";
+
   return (
     <>
       <div className="flex w-full h-[180px] justify-center items-center relative">
@@ -31,12 +59,23 @@ const UserInfo = ({ setPopup, user }: UserInfoProps) => {
             alt="profile-photo"
             className="h-[100px] w-[100px] object-cover object-center rounded-full"
           />
-          {setPopup && (
+          {setPopup ? (
             <button
               onClick={() => setPopup(true)}
-              className="px-6 py-2 hover:opacity-70 text-secondary-btn-text rounded-full bg-secondary-btn font-medium"
+              className="px-6 py-2 hover:opacity-70 cursor-pointer text-secondary-btn-text rounded-full bg-secondary-btn font-medium"
             >
               Edit
+            </button>
+          ) : (
+            <button
+              onClick={handleFollow}
+              className={`px-6 py-2 cursor-pointer hover:opacity-70 rounded-full ${
+                res
+                  ? "border-2 border-color text-text"
+                  : "bg-secondary-btn text-secondary-btn-text"
+              } font-medium`}
+            >
+              {res ? "Unfollow" : "Follow"}
             </button>
           )}
         </div>

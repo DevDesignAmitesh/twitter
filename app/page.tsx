@@ -6,17 +6,14 @@ import { user as User } from "./api/actions/user";
 
 const page = async () => {
   const session: any = await getServerSession(auth);
-
   const email = session?.user?.email;
+
   const existingUser = await User(email);
-  const user = existingUser.user
+  const user = existingUser.user;
 
   return (
     <>
-      <CenterScreen
-        session={session!}
-        existingUser={user}
-      />
+      <CenterScreen session={session!} existingUser={user} />
     </>
   );
 };

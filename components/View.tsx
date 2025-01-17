@@ -7,7 +7,7 @@ import { RxCross2 } from "react-icons/rx";
 import AllTwittes from "./CenterScreen/AllTwittes";
 import { useRouter } from "next/navigation";
 
-const View = ({ post }: { post: any }) => {
+const View = ({ post, list, user }: { post: any; list?: any; user?: any }) => {
   const router = useRouter();
   const [panel, setPanel] = useState<boolean>(false);
   return (
@@ -31,9 +31,10 @@ const View = ({ post }: { post: any }) => {
           </div>
         </div>
         <Header visible label={post[0]?.user?.name} setPanel={setPanel} />
-        <UserInfo user={post[0]?.user} />
+        <UserInfo list={list} user={post[0]?.user} />
         {post?.map((tweet: any) => (
           <AllTwittes
+            existingUser={user}
             tweet={tweet}
             onClick={() => router.push(`/tweet/${tweet.id}`)}
           />

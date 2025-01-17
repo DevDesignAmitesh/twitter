@@ -93,6 +93,7 @@ const CenterScreen = ({
       )}
       {tweets.map((tweet: any) => (
         <AllTwittes
+          existingUser={existingUser}
           tweet={tweet}
           onClick={() => router.push(`/tweet/${tweet.id}`)}
         />

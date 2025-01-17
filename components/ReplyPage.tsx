@@ -9,15 +9,7 @@ import { addComment } from "@/app/api/actions/addComment";
 import axios from "axios";
 import useSWR from "swr";
 
-const ReplyPage = ({
-  tweet,
-  user,
-  id
-}: {
-  tweet: any;
-  user: any;
-  id: any
-}) => {
+const ReplyPage = ({ tweet, user, id }: { tweet: any; user: any; id: any }) => {
   const [panel, setPanel] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [comment, setComment] = useState<string>("");
@@ -27,7 +19,9 @@ const ReplyPage = ({
     return response.data.comments; // Return the comments from the response
   };
 
-  const { data: comments, error, isLoading } = useSWR(
+  const {
+    data: comments,
+  } = useSWR(
     id ? `/api/getComments?postId=${id}` : null, // Only fetch if postId exists
     fetchComments
   );
@@ -65,7 +59,7 @@ const ReplyPage = ({
         </div>
       </div>
       <Header visible label="Tweet" setPanel={setPanel} />
-      <AllTwittes tweet={tweet} />
+      <AllTwittes existingUser={user} tweet={tweet} />
       <h1 className="text-xl font-semibold px-5 py-3 w-full text-start">
         Replies
       </h1>
@@ -79,7 +73,7 @@ const ReplyPage = ({
       />
 
       {comments?.map((com: any) => {
-        return <AllTwittes key={com.id} tweet={com} />;
+        return <AllTwittes key={com.id} existingUser={user} tweet={com} />;
       })}
     </div>
   );

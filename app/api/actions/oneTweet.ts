@@ -15,8 +15,5 @@ export async function oneTweet(id: any) {
       comments: true,
     },
   });
-
-  console.log(tweet)
-
   return { tweet };
 }

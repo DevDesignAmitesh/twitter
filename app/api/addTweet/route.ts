@@ -33,6 +33,13 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    await prisma.notification.create({
+      data: {
+        body: "Post uploads successfully",
+        userId: user.id,
+      },
+    });
+
     return NextResponse.json(
       { message: "Tweet added successfully" },
       { status: 201 }

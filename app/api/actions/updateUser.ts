@@ -19,7 +19,7 @@ export async function UpdateUser(
   if (!existingUser) {
     return { message: "user not found with this email" };
   }
-  await prisma.user.update({
+  const updatedUser = await prisma.user.update({
     where: {
       email: existingUser.email || "",
     },
@@ -29,6 +29,13 @@ export async function UpdateUser(
       bio: description,
       prfileImage: profileImg,
       coverImage: bgImg,
+    },
+  });
+
+  await prisma.notification.create({
+    data: {
+      body: "user updated succesfully",
+      userId: updatedUser.id,
     },
   });
 

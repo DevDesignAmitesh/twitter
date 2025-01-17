@@ -1,48 +1,26 @@
-"use client";
-
 import React from "react";
-import { FaBell, FaFeatherPointed, FaUser, FaXTwitter } from "react-icons/fa6";
-import { IoHome } from "react-icons/io5";
-import { BiLogOut } from "react-icons/bi";
-import LeftSideBarItems from "./LeftSideBarItems";
-import ToggleBtn from "../ToggleBtn";
-import { useRouter } from "next/navigation";
-import { signOut } from "next-auth/react";
+import MainLeftSideBar from "./MainLeftSideBar";
+import { getServerSession } from "next-auth";
+import { auth } from "@/lib/auth";
+import { user as User } from "../../app/api/actions/user";
+import { allNotification } from "@/app/api/actions/allNotification";
+import { redirect } from "next/navigation";
 
-const LeftSideBar = ({ session }: any) => {
-  const router = useRouter();
+const LeftSideBar = async () => {
+  const session: any = await getServerSession(auth);
+  if (!session) {
+    redirect("/auth");
+  }
+  const email = session?.user?.email;
+
+  const existingUser = await User(email);
+  const user = existingUser.user;
+
+  const notifications = await allNotification(user?.id);
   return (
-    <div className="h-full bg-background text-text left-0 fixed xl:left-20 justify-start gap-8 p-5 items-start flex-col hidden sm:flex md:w-[30%] xl:w-[25%]">
-      <FaXTwitter size={30} />
-      {session && (
-        <>
-          <LeftSideBarItems
-            onClick={() => router.push("/")}
-            label="Home"
-            icon={<IoHome size={25} />}
-          />
-          <LeftSideBarItems
-            onClick={() => router.push("/notification")}
-            label="Notifications"
-            icon={<FaBell size={25} />}
-          />
-          <LeftSideBarItems
-            onClick={() => router.push("/profile")}
-            label="Profile"
-            icon={<FaUser size={25} />}
-          />
-          <LeftSideBarItems
-            onClick={() => signOut()}
-            label="Log out"
-            icon={<BiLogOut size={25} />}
-          />
-        </>
-      )}
-      <button className="bg-secondary-btn text-secondary-btn-text p-3 rounded-full block md:hidden">
-        <FaFeatherPointed size={15} />
-      </button>
-      <ToggleBtn />
-    </div>
+    <>
+      <MainLeftSideBar session={session} notifications={notifications} />
+    </>
   );
 };
 
